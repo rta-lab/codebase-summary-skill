@@ -50,6 +50,25 @@ generate a codebase summary, output to ~/docs/my-project
 
 The skill activates automatically when the request matches its trigger (summarize, overview, architecture, map the codebase, list endpoints, etc.).
 
+## Installation
+
+Install the skill with the [Skills CLI](https://skills.sh/):
+
+```
+npx skills add https://github.com/rta-lab/codebase-summary-skill \
+  --skill codebase-summary
+```
+
+Use `--global` for a user-level installation:
+
+```
+npx skills add https://github.com/rta-lab/codebase-summary-skill \
+  --skill codebase-summary \
+  --global
+```
+
+Run `npx skills --help` for agent-selection and non-interactive options.
+
 ## Requirements
 
 - A coding agent with a model that supports tool use and parallel sub-agents
