@@ -1,0 +1,246 @@
+{
+  "$comment": "Single source of truth for summary.json structure (see SKILL.md Phase 3). validate-summary.cjs reads this file directly.",
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "project_name": {
+        "type": "string",
+        "description": "Name of the project (from package.json, Cargo.toml, directory name, etc.)"
+      },
+      "description": {
+        "type": "string",
+        "description": "2-4 sentence plain-language description of what the project does and who it's for."
+      },
+      "entry_point": {
+        "type": "string",
+        "description": "Relative file path to the main entry point (e.g. src/index.ts, main.py, cmd/server/main.go)."
+      },
+      "architecture_pattern": {
+        "type": "string",
+        "enum": [
+          "monolith",
+          "modular_monolith",
+          "microservices",
+          "serverless",
+          "cli_tool",
+          "library",
+          "pipeline",
+          "event_driven",
+          "plugin_based",
+          "static_site",
+          "other"
+        ],
+        "description": "The dominant architectural pattern observed in the code."
+      },
+      "architecture_description": {
+        "type": "string",
+        "description": "1-3 paragraph prose description of the architecture, covering data flow and key design decisions."
+      },
+      "architecture_diagram_mermaid": {
+        "type": "string",
+        "description": "Complete Mermaid diagram source code for the architecture (graph TD, graph LR, C4Context, etc.)."
+      },
+      "tech_stack": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "properties": {
+            "layer": {
+              "type": "string",
+              "enum": [
+                "language",
+                "framework",
+                "database",
+                "orm",
+                "cache",
+                "queue",
+                "search",
+                "auth",
+                "cloud_platform",
+                "containerization",
+                "ci_cd",
+                "testing",
+                "monitoring",
+                "other"
+              ]
+            },
+            "technology": {
+              "type": "string",
+              "description": "Technology name and version if known (e.g. 'Express 4.18', 'Python 3.11')."
+            },
+            "evidence_file": {
+              "type": "string",
+              "description": "Relative file path that proves this technology is used (e.g. 'package.json', 'requirements.txt')."
+            }
+          },
+          "required": ["layer", "technology", "evidence_file"],
+          "additionalProperties": false
+        }
+      },
+      "modules": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Module/package/directory name."
+            },
+            "path": {
+              "type": "string",
+              "description": "Relative path to the module root."
+            },
+            "purpose": {
+              "type": "string",
+              "description": "Single sentence explaining what this module does."
+            },
+            "key_files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "2-5 most important files in the module (relative paths)."
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Names of other internal modules this module depends on. Empty array if none."
+            }
+          },
+          "required": ["name", "path", "purpose", "key_files", "dependencies"],
+          "additionalProperties": false
+        }
+      },
+      "api_endpoints": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string",
+              "enum": [
+                "http",
+                "graphql",
+                "grpc",
+                "websocket",
+                "cli",
+                "library_export",
+                "background_job",
+                "webhook",
+                "message_consumer",
+                "other"
+              ]
+            },
+            "method": {
+              "type": "string",
+              "description": "HTTP method, CLI command name, gRPC method, etc. Use 'N/A' for categories where method doesn't apply."
+            },
+            "path": {
+              "type": "string",
+              "description": "URL path, command string, function signature, event name, etc."
+            },
+            "handler": {
+              "type": "string",
+              "description": "Handler function or method name."
+            },
+            "file": {
+              "type": "string",
+              "description": "Relative file path where the handler is defined."
+            },
+            "line": {
+              "type": "integer",
+              "description": "Line number where the handler is defined."
+            },
+            "auth_required": {
+              "type": "string",
+              "enum": ["yes", "no", "unknown"],
+              "description": "Whether authentication is required. 'unknown' if not determinable from code inspection."
+            },
+            "description": {
+              "type": "string",
+              "description": "One-line description of what this endpoint does."
+            }
+          },
+          "required": ["category", "method", "path", "handler", "file", "line", "auth_required", "description"],
+          "additionalProperties": false
+        }
+      },
+      "configuration": {
+        "type": "object",
+        "properties": {
+          "env_vars": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "required": {
+                  "type": "string",
+                  "enum": ["yes", "no", "unknown"]
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "required": ["name", "required", "description"],
+              "additionalProperties": false
+            }
+          },
+          "config_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Relative paths to configuration files the project reads."
+          },
+          "external_services": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "External services the project connects to at runtime (databases, APIs, queues, etc.)."
+          }
+        },
+        "required": ["env_vars", "config_files", "external_services"],
+        "additionalProperties": false
+      },
+      "observations": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string",
+              "enum": ["quality", "gap", "notable", "concern"]
+            },
+            "description": {
+              "type": "string"
+            }
+          },
+          "required": ["category", "description"],
+          "additionalProperties": false
+        },
+        "description": "Noteworthy observations about code quality, gaps, or patterns."
+      }
+    },
+    "required": [
+      "project_name",
+      "description",
+      "entry_point",
+      "architecture_pattern",
+      "architecture_description",
+      "architecture_diagram_mermaid",
+      "tech_stack",
+      "modules",
+      "api_endpoints",
+      "configuration",
+      "observations"
+    ],
+    "additionalProperties": false
+  }
+}
